@@ -63,7 +63,7 @@ git clone https://github.com/datascouting/wed.git
 ```
 3. Open the Wed Editor project
 ```sh
-cd wed-editor
+cd wed
 ``` 
 4. Edit the `docker-compose-development.yml` file
     - Change the build args (SERVER_USER_UID, SERVER_USER_GID, SERVER_USER_PASSWORD)
@@ -71,7 +71,7 @@ cd wed-editor
         ```sh
             id
         ```
-    - Change the host port (8080) (Optional)
+    - Change the host port (8088) (Optional)
 5. Make the DoComUtil (Docker Compose Util) executable
 ```sh
 chmod +x ./DoComUtil
@@ -88,8 +88,8 @@ chmod +x ./DoComUtil
 ```sh
 ./DoComUtil deploy dev
 ``` 
-9. Open on the browser the url [http://localhost:8080](http://localhost:8080)
-    - Replace the 8080 with your own port
+9. Open on the browser the url [http://localhost:8088](http://localhost:8088)
+    - Replace the 8088 with your own port
 
 
 <!-- LICENSE -->
