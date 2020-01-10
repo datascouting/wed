@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  development-server:
+    container_name: "wed-development-server"
+    build:
+      dockerfile: Dockerfile.development
+      context: .
+      args:
+        - SERVER_USER_UID=1000
+        - SERVER_USER_GID=1000
+        - SERVER_USER_PASSWORD=secret
+    restart: on-failure
+    volumes:
+      - ./wed:/home/user/wed
+      - ./www:/home/user/vhosts/public
+    ports:
+      - 8088:80

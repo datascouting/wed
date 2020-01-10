@@ -1,0 +1,54 @@
+#!/bin/bash
+
+MODE=$2
+
+case ${MODE} in
+prod)
+  DOCKER_FILE=docker-compose-production.yml
+  ;;
+*)
+  DOCKER_FILE=docker-compose-development.yml
+  ;;
+esac
+
+echo "docker-compose to use => ${DOCKER_FILE}"
+
+ACTION=$1
+
+case ${ACTION} in
+start)
+  docker-compose -f "${DOCKER_FILE}" up -d
+  ;;
+stop)
+  docker-compose -f "${DOCKER_FILE}" stop
+  ;;
+remove)
+  docker-compose -f "${DOCKER_FILE}" down -v
+  ;;
+build)
+  if [ "${DOCKER_FILE}" == "docker-compose-production.yml"  ];
+  then
+    docker build -f Dockerfile.production -t wed-ds:latest .
+  fi
+  docker-compose -f "${DOCKER_FILE}" build
+  ;;
+access)
+  if [ "${DOCKER_FILE}" == "docker-compose-production.yml"  ];
+  then
+      docker exec -it --user user wed-production-server /bin/bash
+  else
+      docker exec -it --user user wed-development-server /bin/bash
+  fi
+  ;;
+deploy)
+  if [ "${DOCKER_FILE}" == "docker-compose-production.yml"  ];
+  then
+      echo "ERROR: You can't deploy on production mode, its already deployed!"
+  else
+      docker exec --user user wed-development-server /bin/bash -c "buildAndDeployWed"
+  fi
+  ;;
+*)
+  docker-compose -f $DOCKER_FILE up -d
+  ;;
+esac

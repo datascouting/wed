@@ -1,0 +1,55 @@
+{
+  "rules": {
+    "prefer-for-of": [
+      false
+    ],
+    "promise-function-async": [
+      false
+    ],
+    "radix": [
+      false
+    ],
+    "no-non-null-assertion": [
+      false
+    ],
+    "newline-before-return": [
+      false
+    ],
+    "no-parameter-reassignment": [
+      false
+    ],
+    "no-import-side-effect": [
+      false
+    ],
+    "await-promise": [
+      true,
+      "Bluebird"
+    ],
+    "no-backbone-get-set-outside-model": [
+      false,
+      "False positives galore."
+    ],
+    "no-implicit-dependencies": [
+      false,
+      "Way too many false positives."
+    ],
+    "match-default-export-name": [
+      false
+    ],
+    "no-submodule-imports": [
+      true,
+      "rxjs",
+      "wed",
+      "tests"
+    ],
+    "no-unused-variable": false,
+    "import-name": [
+      true,
+      {
+        "jquery": "$",
+        "ajv": "Ajv",
+        "lodash": "_"
+      }
+    ]
+  }
+}

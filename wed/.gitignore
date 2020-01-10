@@ -1,0 +1,12 @@
+/local_config
+/node_modules
+/downloads
+/build
+/schemas/out
+/gulp.local.js
+/test_logs
+/*.html
+*_flymake.*
+*.pyc
+/.venv
+.dir-locals.el

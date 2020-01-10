@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta content="text/xhtml; charset=utf-8" http-equiv="Content-Type"/>
+  <link href="/node_modules/mocha/mocha.css" media="screen" rel="stylesheet"
+        type="text/css"/>
+  <script src="lib/external/core-js.min.js" type="text/javascript"></script>
+  <script src="lib/external/bluebird.js" type="text/javascript"></script>
+  <script src="lib/wed/polyfills/matches.js" type="text/javascript"></script>
+  <script src="lib/wed/polyfills/innerHTML_for_XML.js"
+          type="text/javascript"></script>
+  <script src="lib/wed/polyfills/normalize.js" type="text/javascript"></script>
+  <script src="lib/requirejs/require.js" type="text/javascript"></script>
+  <script src="requirejs-config.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="mocha"></div>
+<div id="mocha-fixture">
+  <div style="display:none">
+    <div id="data"></div>
+    <!-- This should remain empty -->
+    <div id="empty-data"></div>
+    <div id="domroot"></div>
+    <!-- Contain the editor it its own frame so that the styles do
+         not mess with those of mocha. -->
+  </div>
+</div>
+<script>
+  require(["urijs/URI"], function (URI) {
+    var uri = new URI();
+    var query = uri.query(true);
+    window.test_platform = query.platform;
+    window.test_browser = query.browser;
+    window.test_version = query.version;
+  });
+</script>
+</body>
+</html>
