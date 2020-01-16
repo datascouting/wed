@@ -162,12 +162,6 @@ const FRAMEWORK_TEMPLATE = "\
  <div class='toolbar'></div>\
  <div class='wed-frame col-sm-push-2 col-lg-10 col-md-10 col-sm-10'>\
   <div class='row'>\
-   <div class='progress'>\
-    <span></span>\
-    <div class='wed-validation-progress progress-bar' style='width: 0%'></div>\
-   </div>\
-  </div>\
-  <div class='row'>\
    <div class='wed-document-constrainer'>\
     <input class='wed-comp-field' type='text'></input>\
     <div class='wed-scroller'>\
@@ -207,7 +201,13 @@ const FRAMEWORK_TEMPLATE = "\
      </div>\
     </div>\
    </div>\
-   <div class='panel panel-danger'>\
+  <div class='row'>\
+   <div class='progress'>\
+    <span></span>\
+    <div class='wed-validation-progress progress-bar' style='width: 0%'></div>\
+   </div>\
+  </div>\
+   <div class='panel panel-danger no-tei-errors'>\
     <div class='panel-heading'>\
      <div class='panel-title'>\
       <a class='accordion-toggle' data-toggle='collapse'\
@@ -3262,7 +3262,6 @@ cannot be cut.`, {type: "danger"});
         if (ev.target.classList.contains("wed-validation-error")) {
           return true;
         }
-
         break;
       case 3:
         const range = this.caretManager.range;
