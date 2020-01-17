@@ -6,7 +6,12 @@
  */
 
 import {EventSet, Grammar} from "salve";
-import {ErrorData, Validator as BaseValidator, WorkingState} from "salve-dom";
+import {
+  ErrorData,
+  Options,
+  Validator as BaseValidator,
+  WorkingState
+} from "salve-dom";
 
 import * as dloc from "./dloc";
 import {isElement, isNode} from "./domtypeguards";
@@ -35,13 +40,27 @@ export class Validator extends BaseValidator {
    * document to validate but is not **part** of it.
    *
    * @param modeValidators The mode-specific validators to use.
+   * @param options
    */
-  constructor(schema: Grammar, root: Element | Document,
-              private readonly modeValidators: ModeValidator[]) {
-    super(schema, root, {
-      timeout: 0,
-      maxTimespan: 100,
-    });
+  constructor(schema: Grammar,
+              root: Element | Document,
+              private readonly modeValidators: ModeValidator[],
+              options: Options) {
+    super(schema, root, options);
+  }
+
+  public static constructDefault(schema: Grammar,
+                                 root: Element | Document,
+                                 modeValidators: ModeValidator[]) {
+    return new Validator(
+      schema,
+      root,
+      modeValidators,
+      {
+        timeout: 0,
+        maxTimespan: 100
+      }
+    );
   }
 
   /**

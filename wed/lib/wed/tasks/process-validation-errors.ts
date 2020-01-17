@@ -17,6 +17,10 @@ export interface Controller {
   appendMarkers(markers: HTMLElement[]): void;
 }
 
+function NOT(bool: boolean) {
+  return !(bool);
+}
+
 /**
  * This task processes the new validation errors that have not been processed
  * yet.
@@ -31,10 +35,26 @@ export class ProcessValidationErrors implements Task {
     this.errors = this.controller.copyErrorList();
   }
 
+  setErrorClass(hasErrors: boolean): void {
+    Promise.resolve('#sb-errors-collapse')
+      .then(errorsId => $(errorsId))
+      .then(errorsDom => errorsDom.parent())
+      .then(errorsDom => {
+        return Promise.resolve('no-tei-errors')
+          .then(noErrorsClass => (hasErrors)
+            ? errorsDom.removeClass(noErrorsClass)
+            : errorsDom.addClass(noErrorsClass))
+      });
+  }
+
   cycle(): boolean {
     const controller = this.controller;
     const errors = this.errors;
-    if (errors.length === 0) {
+    const hasErrors = (errors.length > 0);
+
+    this.setErrorClass(hasErrors);
+
+    if (NOT(hasErrors)) {
       return false;
     }
 

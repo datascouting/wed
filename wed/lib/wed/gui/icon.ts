@@ -6,6 +6,7 @@
  */
 const ICON_NAMES: Record<string, string> = Object.create(null);
 
+ICON_NAMES.validate = "fa-check";
 ICON_NAMES.add = "fa-plus";
 ICON_NAMES.delete = "fa-times";
 ICON_NAMES.wrap = "fa-caret-square-o-down";
