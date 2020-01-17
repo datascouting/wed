@@ -324,6 +324,8 @@ export interface EditorAPI {
    */
   save(): Promise<void>;
 
+  validate(): Promise<void>;
+
   /**
    * Inserts a transient placeholder. A transient placeholder is one that
    * disappears if the caret is moved out of it.

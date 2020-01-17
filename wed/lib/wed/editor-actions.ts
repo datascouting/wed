@@ -66,6 +66,14 @@ export const Save =
     });
 
 // tslint:disable-next-line:variable-name
+export const Validate =
+  makeAction("Validate", makeHTML("validate"), false,
+    (editor) => {
+      // tslint:disable-next-line:no-floating-promises
+      editor.validate();
+    });
+
+// tslint:disable-next-line:variable-name
 export const Undo =
   makeAction("Undo", makeHTML("undo"), false,
     (editor) => {

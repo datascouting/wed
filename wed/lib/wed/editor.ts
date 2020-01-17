@@ -255,6 +255,8 @@ export class Editor implements EditorAPI {
   readonly removeMarkupTr: Transformation<TransformationData>;
   readonly saveAction: Action<{}> =
     new editorActions.Save(this);
+  readonly validateAction: Action<{}> =
+    new editorActions.Validate(this);
   readonly decreaseLabelVisibilityLevelAction: Action<{}> =
     new editorActions.DecreaseLabelVisibilityLevel(this);
   readonly increaseLabelVisibilityLevelAction: Action<{}> =
@@ -568,6 +570,7 @@ export class Editor implements EditorAPI {
 
     toolbar.addButton([
       this.saveAction.makeButton(),
+      this.validateAction.makeButton(),
       this.undoAction.makeButton(),
       this.redoAction.makeButton(),
       this.decreaseLabelVisibilityLevelAction.makeButton(),
@@ -753,6 +756,24 @@ export class Editor implements EditorAPI {
 
   save(): Promise<void> {
     return this.saver.save();
+  }
+
+  validate(): Promise<void> {
+    // TODO: Optimize
+    let document = $('.wed-document').children().get()[0];
+    this.validator.restartAt(document);
+
+    return Promise.resolve()
+      .then(() => {
+        let working = this.validator.getWorkingState().state === WorkingState.WORKING;
+        let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
+
+        while (working || incomplete) {
+          // WAIT
+        }
+
+        return;
+      });
   }
 
   insertText(text: string): void {
@@ -1701,7 +1722,8 @@ export class Editor implements EditorAPI {
       return this;
     }
 
-    this.addValidators();
+    // this.addValidators();
+    console.log(this.addValidators);
 
     this.modeTree.addDecoratorHandlers();
 
