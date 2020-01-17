@@ -566,7 +566,8 @@ export class Editor implements EditorAPI {
           needsInput: true,
         });
 
-    toolbar.addButton([this.saveAction.makeButton(),
+    toolbar.addButton([
+      this.saveAction.makeButton(),
       this.undoAction.makeButton(),
       this.redoAction.makeButton(),
       this.decreaseLabelVisibilityLevelAction.makeButton(),
@@ -574,7 +575,8 @@ export class Editor implements EditorAPI {
       this.removeMarkupTr.makeButton(),
       this.toggleAttributeHidingAction.makeButton(),
       this.setSelectionModeToSpan.makeButton(),
-      this.setSelectionModeToUnit.makeButton()]);
+      this.setSelectionModeToUnit.makeButton()
+    ]);
 
     // Setup the cleanup code.
     $(this.window).on("unload.wed", {editor: this}, (e) => {
@@ -1662,13 +1664,23 @@ export class Editor implements EditorAPI {
       throw new Error("unexpected value for schema");
     }
 
-    this.validator = new Validator(schema, this.dataRoot,
-      this.modeTree.getValidators());
+    let validators = this.modeTree.getValidators();
+
+    this.validator = Validator.constructDefault(
+      schema,
+      this.dataRoot,
+      validators
+    );
+
     this.validator.events.addEventListener(
-      "state-update", this.onValidatorStateChange.bind(this));
+      "state-update",
+      this.onValidatorStateChange.bind(this)
+    );
     this.validator.events.addEventListener(
       "possible-due-to-wildcard-change",
-      this.onPossibleDueToWildcardChange.bind(this));
+      this.onPossibleDueToWildcardChange.bind(this)
+    );
+
     this.validationController =
       new ValidationController(this,
         this.validator,
@@ -1689,46 +1701,7 @@ export class Editor implements EditorAPI {
       return this;
     }
 
-    // Make the validator revalidate the structure from the point where a change
-    // occurred.
-    this.domlistener.addHandler(
-      "children-changed",
-      "._real, ._phantom_wrap, .wed-document",
-      (_root: Node, added: Node[], removed: Node[], _prev: Node | null,
-       _next: Node | null, target: Element) => {
-        for (const child of added.concat(removed)) {
-          if (isText(child) ||
-            (isElement(child) &&
-              (child.classList.contains("_real") ||
-                child.classList.contains("_phantom_wrap")))) {
-            this.validator.resetTo(target);
-            break;
-          }
-        }
-      });
-
-    // Revalidate on attribute change.
-    this.domlistener.addHandler(
-      "attribute-changed",
-      "._real",
-      (_root: Node, el: Element, namespace: string, name: string) => {
-        if (namespace === "" && name.indexOf("data-wed", 0) === 0) {
-          // Doing the restart immediately messes up the editing. So schedule it
-          // for ASAP.
-          setTimeout(() => {
-            if (this.destroyed) {
-              return;
-            }
-            this.validator.resetTo(el);
-          }, 0);
-        }
-      });
-
-    // Revalidate on text change.
-    this.domlistener.addHandler("text-changed", "._real",
-      (_root: Node, text: Node) => {
-        this.validator.resetTo(text);
-      });
+    this.addValidators();
 
     this.modeTree.addDecoratorHandlers();
 
@@ -2045,6 +2018,49 @@ wed's generic help. The link by default will open in a new tab.</p>`);
     await savePromise;
     this.initializedResolve(this);
     return this;
+  }
+
+  private addValidators() {
+    // Make the validator revalidate the structure from the point where a change
+    // occurred.
+    this.domlistener.addHandler(
+      "children-changed",
+      "._real, ._phantom_wrap, .wed-document",
+      (_root: Node, added: Node[], removed: Node[], _prev: Node | null,
+       _next: Node | null, target: Element) => {
+
+        for (const child of added.concat(removed)) {
+          if (isText(child) ||
+            (isElement(child) &&
+              (child.classList.contains("_real") ||
+                child.classList.contains("_phantom_wrap")))) {
+            this.validator.resetTo(target);
+            break;
+          }
+        }
+      });
+    // Revalidate on attribute change.
+    this.domlistener.addHandler(
+      "attribute-changed",
+      "._real",
+      (_root: Node, el: Element, namespace: string, name: string) => {
+        if (namespace === "" && name.indexOf("data-wed", 0) === 0) {
+          // Doing the restart immediately messes up the editing. So schedule it
+          // for ASAP.
+          setTimeout(() => {
+            if (this.destroyed) {
+              return;
+            }
+            this.validator.resetTo(el);
+          }, 0);
+        }
+      });
+
+    // Revalidate on text change.
+    this.domlistener.addHandler("text-changed", "._real",
+      (_root: Node, text: Node) => {
+        this.validator.resetTo(text);
+      });
   }
 
   /**
@@ -3429,12 +3445,17 @@ cannot be cut.`, {type: "danger"});
 
   private onValidatorStateChange(workingState: WorkingStateData): void {
     const state = workingState.state;
-    if (state === WorkingState.VALID || state === WorkingState.INVALID) {
-      if (!this._firstValidationComplete) {
-        this._firstValidationComplete = true;
-        this.firstValidationCompleteResolve(this);
-      }
+
+    if (!(state === WorkingState.VALID || state === WorkingState.INVALID)) {
+      return;
     }
+
+    if (this._firstValidationComplete) {
+      return;
+    }
+
+    this._firstValidationComplete = true;
+    this.firstValidationCompleteResolve(this);
   }
 
   private onPossibleDueToWildcardChange(node: Node): void {
