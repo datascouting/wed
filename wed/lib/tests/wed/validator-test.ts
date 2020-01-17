@@ -54,7 +54,7 @@ describe("validator", () => {
 
   describe("possibleAt", () => {
     it("with DLoc", () => {
-      const p = new validator.Validator(grammar, emptyTree, []);
+      const p = validator.Validator.constructDefault(grammar, emptyTree, []);
       const evs = p.possibleAt(DLoc.mustMakeDLoc(emptyDataRoot, emptyTree, 0));
 
       let eventExpected = new EnterStartTagEvent(
@@ -70,7 +70,7 @@ describe("validator", () => {
     it("with DLoc", () => {
       const tree = genericTree.cloneNode(true) as Document;
       const dataRoot = new DLocRoot(tree);
-      const p = new validator.Validator(grammar, tree, []);
+      const p = validator.Validator.constructDefault(grammar, tree, []);
       const body = tree.getElementsByTagName("body")[0];
       const container = body.parentNode!;
       const index = Array.prototype.indexOf.call(container.childNodes, body);
@@ -86,7 +86,7 @@ describe("validator", () => {
     it("throws an error if toParse is not an element", () => {
       const tree = genericTree.cloneNode(true) as Document;
       const dataRoot = new DLocRoot(tree);
-      const p = new validator.Validator(grammar, tree, []);
+      const p = validator.Validator.constructDefault(grammar, tree, []);
       // tslint:disable-next-line:no-any
       (p as any)._maxTimespan = 0; // Work forever.
       const body = tree.getElementsByTagName("body")[0];
@@ -120,7 +120,7 @@ describe("validator", () => {
         }
       }
 
-      p = new validator.Validator(grammar, tree, [new Validator()]);
+      p = validator.Validator.constructDefault(grammar, tree, [new Validator()]);
       // tslint:disable-next-line:no-any
       (p as any)._maxTimespan = 0; // Work forever.
     });

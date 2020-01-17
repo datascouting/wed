@@ -88,7 +88,7 @@ import {Validator} from "./validator";
 import {boundaryXY, getGUINodeIfExists} from "./wed-util";
 import * as wundo from "./wundo";
 
-export const version = "4.0.0";
+export const version = "5.1.1";
 
 export type KeydownHandler = (wedEv: JQueryEventObject,
                               ev: JQueryKeyEventObject) => boolean;
@@ -162,12 +162,6 @@ const FRAMEWORK_TEMPLATE = "\
  <div class='toolbar'></div>\
  <div class='wed-frame col-sm-push-2 col-lg-10 col-md-10 col-sm-10'>\
   <div class='row'>\
-   <div class='progress'>\
-    <span></span>\
-    <div class='wed-validation-progress progress-bar' style='width: 0%'></div>\
-   </div>\
-  </div>\
-  <div class='row'>\
    <div class='wed-document-constrainer'>\
     <input class='wed-comp-field' type='text'></input>\
     <div class='wed-scroller'>\
@@ -207,7 +201,13 @@ const FRAMEWORK_TEMPLATE = "\
      </div>\
     </div>\
    </div>\
-   <div class='panel panel-danger'>\
+  <div class='row'>\
+   <div class='progress'>\
+    <span></span>\
+    <div class='wed-validation-progress progress-bar' style='width: 0%'></div>\
+   </div>\
+  </div>\
+   <div class='panel panel-danger no-tei-errors'>\
     <div class='panel-heading'>\
      <div class='panel-title'>\
       <a class='accordion-toggle' data-toggle='collapse'\
@@ -255,6 +255,8 @@ export class Editor implements EditorAPI {
   readonly removeMarkupTr: Transformation<TransformationData>;
   readonly saveAction: Action<{}> =
     new editorActions.Save(this);
+  readonly validateAction: Action<{}> =
+    new editorActions.Validate(this);
   readonly decreaseLabelVisibilityLevelAction: Action<{}> =
     new editorActions.DecreaseLabelVisibilityLevel(this);
   readonly increaseLabelVisibilityLevelAction: Action<{}> =
@@ -566,7 +568,9 @@ export class Editor implements EditorAPI {
           needsInput: true,
         });
 
-    toolbar.addButton([this.saveAction.makeButton(),
+    toolbar.addButton([
+      this.saveAction.makeButton(),
+      this.validateAction.makeButton(),
       this.undoAction.makeButton(),
       this.redoAction.makeButton(),
       this.decreaseLabelVisibilityLevelAction.makeButton(),
@@ -574,7 +578,8 @@ export class Editor implements EditorAPI {
       this.removeMarkupTr.makeButton(),
       this.toggleAttributeHidingAction.makeButton(),
       this.setSelectionModeToSpan.makeButton(),
-      this.setSelectionModeToUnit.makeButton()]);
+      this.setSelectionModeToUnit.makeButton()
+    ]);
 
     // Setup the cleanup code.
     $(this.window).on("unload.wed", {editor: this}, (e) => {
@@ -751,6 +756,24 @@ export class Editor implements EditorAPI {
 
   save(): Promise<void> {
     return this.saver.save();
+  }
+
+  validate(): Promise<void> {
+    // TODO: Optimize
+    let document = $('.wed-document').children().get()[0];
+    this.validator.restartAt(document);
+
+    return Promise.resolve()
+      .then(() => {
+        let working = this.validator.getWorkingState().state === WorkingState.WORKING;
+        let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
+
+        while (working || incomplete) {
+          // WAIT
+        }
+
+        return;
+      });
   }
 
   insertText(text: string): void {
@@ -1662,13 +1685,23 @@ export class Editor implements EditorAPI {
       throw new Error("unexpected value for schema");
     }
 
-    this.validator = new Validator(schema, this.dataRoot,
-      this.modeTree.getValidators());
+    let validators = this.modeTree.getValidators();
+
+    this.validator = Validator.constructDefault(
+      schema,
+      this.dataRoot,
+      validators
+    );
+
     this.validator.events.addEventListener(
-      "state-update", this.onValidatorStateChange.bind(this));
+      "state-update",
+      this.onValidatorStateChange.bind(this)
+    );
     this.validator.events.addEventListener(
       "possible-due-to-wildcard-change",
-      this.onPossibleDueToWildcardChange.bind(this));
+      this.onPossibleDueToWildcardChange.bind(this)
+    );
+
     this.validationController =
       new ValidationController(this,
         this.validator,
@@ -1689,46 +1722,8 @@ export class Editor implements EditorAPI {
       return this;
     }
 
-    // Make the validator revalidate the structure from the point where a change
-    // occurred.
-    this.domlistener.addHandler(
-      "children-changed",
-      "._real, ._phantom_wrap, .wed-document",
-      (_root: Node, added: Node[], removed: Node[], _prev: Node | null,
-       _next: Node | null, target: Element) => {
-        for (const child of added.concat(removed)) {
-          if (isText(child) ||
-            (isElement(child) &&
-              (child.classList.contains("_real") ||
-                child.classList.contains("_phantom_wrap")))) {
-            this.validator.resetTo(target);
-            break;
-          }
-        }
-      });
-
-    // Revalidate on attribute change.
-    this.domlistener.addHandler(
-      "attribute-changed",
-      "._real",
-      (_root: Node, el: Element, namespace: string, name: string) => {
-        if (namespace === "" && name.indexOf("data-wed", 0) === 0) {
-          // Doing the restart immediately messes up the editing. So schedule it
-          // for ASAP.
-          setTimeout(() => {
-            if (this.destroyed) {
-              return;
-            }
-            this.validator.resetTo(el);
-          }, 0);
-        }
-      });
-
-    // Revalidate on text change.
-    this.domlistener.addHandler("text-changed", "._real",
-      (_root: Node, text: Node) => {
-        this.validator.resetTo(text);
-      });
+    // this.addValidators();
+    console.log(this.addValidators);
 
     this.modeTree.addDecoratorHandlers();
 
@@ -2045,6 +2040,49 @@ wed's generic help. The link by default will open in a new tab.</p>`);
     await savePromise;
     this.initializedResolve(this);
     return this;
+  }
+
+  private addValidators() {
+    // Make the validator revalidate the structure from the point where a change
+    // occurred.
+    this.domlistener.addHandler(
+      "children-changed",
+      "._real, ._phantom_wrap, .wed-document",
+      (_root: Node, added: Node[], removed: Node[], _prev: Node | null,
+       _next: Node | null, target: Element) => {
+
+        for (const child of added.concat(removed)) {
+          if (isText(child) ||
+            (isElement(child) &&
+              (child.classList.contains("_real") ||
+                child.classList.contains("_phantom_wrap")))) {
+            this.validator.resetTo(target);
+            break;
+          }
+        }
+      });
+    // Revalidate on attribute change.
+    this.domlistener.addHandler(
+      "attribute-changed",
+      "._real",
+      (_root: Node, el: Element, namespace: string, name: string) => {
+        if (namespace === "" && name.indexOf("data-wed", 0) === 0) {
+          // Doing the restart immediately messes up the editing. So schedule it
+          // for ASAP.
+          setTimeout(() => {
+            if (this.destroyed) {
+              return;
+            }
+            this.validator.resetTo(el);
+          }, 0);
+        }
+      });
+
+    // Revalidate on text change.
+    this.domlistener.addHandler("text-changed", "._real",
+      (_root: Node, text: Node) => {
+        this.validator.resetTo(text);
+      });
   }
 
   /**
@@ -3262,7 +3300,6 @@ cannot be cut.`, {type: "danger"});
         if (ev.target.classList.contains("wed-validation-error")) {
           return true;
         }
-
         break;
       case 3:
         const range = this.caretManager.range;
@@ -3430,12 +3467,17 @@ cannot be cut.`, {type: "danger"});
 
   private onValidatorStateChange(workingState: WorkingStateData): void {
     const state = workingState.state;
-    if (state === WorkingState.VALID || state === WorkingState.INVALID) {
-      if (!this._firstValidationComplete) {
-        this._firstValidationComplete = true;
-        this.firstValidationCompleteResolve(this);
-      }
+
+    if (!(state === WorkingState.VALID || state === WorkingState.INVALID)) {
+      return;
     }
+
+    if (this._firstValidationComplete) {
+      return;
+    }
+
+    this._firstValidationComplete = true;
+    this.firstValidationCompleteResolve(this);
   }
 
   private onPossibleDueToWildcardChange(node: Node): void {

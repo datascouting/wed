@@ -8,8 +8,6 @@ cd /home/user/wed
 
 # Remove previous build and node_modules
 rm -fr ./build
-rm -fr ./downloads
-rm -fr ./node_modules
 
 # Fix endlines
 endlines unix -r .

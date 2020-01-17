@@ -1,7 +1,7 @@
 {
   "name": "wed-editor",
   "description": "Wed Editor is a web-based editor that assists users in editing XML documents according to a schema, for example TEI-XML documents.",
-  "version": "5.0.0",
+  "version": "5.1.1",
   "versionedSources": "lib/wed/editor.ts",
   "keywords": [
     "RelaxNG",
@@ -35,6 +35,7 @@
     "webpack-cli": "~3.3.0"
   },
   "devDependencies": {
+    "@types/throttle-debounce": "^2.1.0",
     "@types/argparse": "~1.0.0",
     "@types/bluebird": "~3.5.0",
     "@types/blueimp-md5": "~2.7.0",
@@ -62,6 +63,7 @@
     "bootbox": "~5.2.0",
     "bootstrap": "~3.3.0",
     "bootstrap-notify": "~3.1.0",
+    "throttle-debounce": "^2.1.0",
     "chai": "~4.2.0",
     "child-process-promise": "~2.2.0",
     "classlist-polyfill": "~1.2.0",
