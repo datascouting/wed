@@ -9,8 +9,8 @@ cd /home/user/wed
 # Remove previous build and node_modules
 rm -fr ./build
 
-# Fix endlines
-endlines unix -r .
+# Install node mudules
+npm install
 
-# Install gulp and build
-npm install && ./node_modules/gulp/bin/gulp.js
+# Build with gulp
+./node_modules/gulp/bin/gulp.js
