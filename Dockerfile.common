@@ -1,4 +1,4 @@
-FROM debian:buster as builder
+FROM debian:buster
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 ARG NODE_VERSION=10.x
@@ -20,8 +20,7 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
                                                       trang \
                                                       dos2unix \
  && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y chromium
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
 
 # Install Saxonica's Saxon HE
 WORKDIR /tmp
@@ -59,8 +58,4 @@ RUN mv ./wedUtils/buildWed.sh ./wedUtils/buildWed \
  && chmod +x /usr/bin/buildWed \
  && chmod +x /usr/bin/cleanWed \
  && chmod +x /usr/bin/deployWed \
- && chmod +x /usr/bin/buildAndDeployWed \
- && dos2unix /usr/bin/buildWed \
- && dos2unix /usr/bin/cleanWed \
- && dos2unix /usr/bin/deployWed \
- && dos2unix /usr/bin/buildAndDeployWed
+ && chmod +x /usr/bin/buildAndDeployWed
