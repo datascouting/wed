@@ -2,7 +2,6 @@ FROM debian:buster as builder
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 ARG NODE_VERSION=10.x
-ARG ENDLINES_SRC_PATH=./endlines/endlines-1.9.2-amd64.deb
 ARG SAXON9HE_SRC_PATH=./saxon/saxon9he.jar
 ARG SAXON_SRC_PATH=./saxon/saxon.sh
 ARG ROMA_5_SRC_PATH=./roma/roma-5.0.0.zip
@@ -23,12 +22,6 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y chromium
-
-# Install Endlines
-WORKDIR /tmp
-COPY ${ENDLINES_SRC_PATH} /tmp/endlines.deb
-RUN dpkg -i endlines.deb \
- && rm endlines.deb
 
 # Install Saxonica's Saxon HE
 WORKDIR /tmp
