@@ -1,4 +1,5 @@
 FROM wed-ds-common:latest as builder
+LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 # Copy wed project and www
 COPY ./wed /home/user/wed

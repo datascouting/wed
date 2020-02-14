@@ -10,7 +10,7 @@ cd /home/user/wed
 rm -fr ./build
 
 # Install node mudules
-npm install
+npm install --verbose
 
 # Build with gulp
 ./node_modules/gulp/bin/gulp.js
