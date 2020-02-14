@@ -1,4 +1,4 @@
-FROM wed-ds-common:latest
+FROM wed-ds-common:latest as builder
 
 # Copy wed project and www
 COPY ./wed /home/user/wed
