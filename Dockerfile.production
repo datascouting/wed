@@ -21,7 +21,6 @@ RUN npm install --verbose --prefer-offline --no-audit
 # Build with gulp
 RUN ./node_modules/gulp/bin/gulp.js
 
-
 # Deploy Wed
 RUN deployWed
 
