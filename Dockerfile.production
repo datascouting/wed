@@ -8,11 +8,10 @@ COPY ./www /home/user/vhosts/public
 # Fix wed-metadata file
 RUN chmod +x /home/user/wed/bin/wed-metadata
 
-# Open project path
-RUN cd /home/user/wed
+WORKDIR /home/user/wed
 
 # Remove previous build and node_modules
-RUN rm -fr ./build
+RUN rm -fr /home/user/wed/build
 
 # Install node mudules
 RUN npm install --verbose
