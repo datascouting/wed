@@ -23,7 +23,7 @@ RUN ./node_modules/gulp/bin/gulp.js
 
 
 # Deploy Wed
-RUN DeployWed
+RUN deployWed
 
 FROM nginx:stable as release
 
