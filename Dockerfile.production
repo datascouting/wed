@@ -14,7 +14,7 @@ WORKDIR /home/user/wed
 RUN rm -fr /home/user/wed/build
 
 # Install node mudules
-RUN npm install --verbose
+RUN npm install --verbose --prefer-offline --no-audit
 
 # Build with gulp
 RUN ./node_modules/gulp/bin/gulp.js
