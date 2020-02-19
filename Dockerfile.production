@@ -5,21 +5,8 @@ LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 COPY ./wed /home/user/wed
 COPY ./www /home/user/vhosts/public
 
-# Fix wed-metadata file
-RUN chmod +x /home/user/wed/bin/wed-metadata
-
-WORKDIR /home/user/wed
-
-# Remove previous build and node_modules
-RUN rm -fr /home/user/wed/build
-
-# Install node mudules
-RUN npm install --verbose --prefer-offline --no-audit
-
-# Build with gulp
-RUN ./node_modules/gulp/bin/gulp.js
-
-RUN deployWed
+# Build and deploy wed
+RUN buildAndDeployWed
 
 FROM nginx:stable as release
 
