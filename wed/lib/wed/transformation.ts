@@ -235,6 +235,10 @@ export class Transformation<Data extends TransformationData,
   }
 
   getDescriptionFor(data: Data): string {
+    if(data === null) {
+      return this.desc;
+    }
+
     if (data.name === undefined) {
       return this.desc;
     }
