@@ -1725,6 +1725,8 @@ export class Editor implements EditorAPI {
     // this.addValidators();
     console.log(this.addValidators);
 
+    this.addChildrenChangedValidator();
+
     this.modeTree.addDecoratorHandlers();
 
     this.domlistener.addHandler(
@@ -2042,7 +2044,7 @@ wed's generic help. The link by default will open in a new tab.</p>`);
     return this;
   }
 
-  private addValidators() {
+  private addChildrenChangedValidator() {
     // Make the validator revalidate the structure from the point where a change
     // occurred.
     this.domlistener.addHandler(
@@ -2061,6 +2063,9 @@ wed's generic help. The link by default will open in a new tab.</p>`);
           }
         }
       });
+  }
+
+  private addAttributeChangedValidator() {
     // Revalidate on attribute change.
     this.domlistener.addHandler(
       "attribute-changed",
@@ -2077,12 +2082,20 @@ wed's generic help. The link by default will open in a new tab.</p>`);
           }, 0);
         }
       });
+  }
 
+  private addTextChangedValidator() {
     // Revalidate on text change.
     this.domlistener.addHandler("text-changed", "._real",
       (_root: Node, text: Node) => {
         this.validator.resetTo(text);
       });
+  }
+
+  private addValidators() {
+    this.addChildrenChangedValidator();
+    this.addAttributeChangedValidator();
+    this.addTextChangedValidator();
   }
 
   /**
@@ -2110,33 +2123,43 @@ wed's generic help. The link by default will open in a new tab.</p>`);
   private initializeNamespaces(): string | undefined {
     const mode = this.modeTree.getMode(this.guiRoot);
     const resolver = mode.getAbsoluteResolver();
+
     let failure: string | undefined;
+
     if (this.dataRoot.firstChild === null) {
       // The document is empty: create a child node with the absolute namespace
       // mappings.
       const attrs = Object.create(null);
+
       this.validator.getSchemaNamespaces().forEach((ns) => {
+
+        if (typeof ns === "undefined") {
+          return;
+        }
+
         if (ns === "*" || ns === "::except") {
           return;
         }
 
-        const k = resolver.prefixFromURI(ns);
-        // Don't create a mapping for the `xml`, seeing as it is defined by
-        // default.
-        if (k === "xml") {
+        const prefix = resolver.prefixFromURI(ns);
+
+        if (typeof prefix === "undefined") {
+          failure = `The mode does not allow determining the namespace prefix for ${ns}. The most likely issue is that the mode is buggy or wed was started with incorrect options.`;
           return;
         }
 
-        if (k === "") {
-          attrs.xmlns = ns;
-        } else {
-          if (k === undefined) {
-            failure = `The mode does not allow determining the namespace \
-prefix for ${ns}. The most likely issue is that the mode is buggy or wed was \
-started with incorrect options.`;
-          }
-          attrs[`xmlns:${k}`] = ns;
+        // Don't create a mapping for the `xml`, seeing as it is defined by
+        // default.
+        if (prefix === "xml") {
+          return;
         }
+
+        if (prefix === "") {
+          attrs.xmlns = ns;
+          return;
+        }
+
+        attrs[`xmlns:${prefix}`] = ns;
       });
 
       if (failure !== undefined) {
@@ -2144,16 +2167,20 @@ started with incorrect options.`;
       }
 
       const evs = Array.from(this.validator.possibleAt(this.dataRoot, 0));
+
       if (evs.length === 1 && evs[0].params[0] === "enterStartTag") {
         const name = evs[0].params[1] as salve.BaseName;
+
         // If the name pattern is not simple or it allows for a number of
         // choices, then we skip this creation.
         const asArray = name.toArray();
+
         if (asArray !== null && asArray.length === 1) {
           const simple = asArray[0];
           insertElement(
             this.dataUpdater, this.dataRoot, 0, simple.ns,
             resolver.unresolveName(simple.ns, simple.name)!, attrs);
+
           this.caretManager.setCaret(this.dataRoot.firstElementChild, 0);
         }
       }
@@ -2171,13 +2198,13 @@ started with incorrect options.`;
       Object.keys(namespaces).forEach((prefix) => {
         const uri = namespaces[prefix];
         if (uri.length > 1) {
-          failure = "The document you are trying to edit uses namespaces \
-in a way not supported by this version of wed.";
+          failure = "The document you are trying to edit uses namespaces in a way not supported by this version of wed.";
         }
 
         resolver.definePrefix(prefix, uri[0]);
       });
     }
+
     return failure;
   }
 

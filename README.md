@@ -5,7 +5,6 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
 <!-- PROJECT LOGO -->
 <p align="center">
   <img src="./images/WedEditor.png" alt="WedEditor">
