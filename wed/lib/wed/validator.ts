@@ -30,7 +30,7 @@ export interface ModeValidator {
  */
 export class Validator extends BaseValidator {
 
-  private doValidation: boolean;
+  private canValidate: boolean;
 
   /**
    * @param schema A path to the schema to pass to salve for validation. This is
@@ -51,12 +51,12 @@ export class Validator extends BaseValidator {
               options: Options) {
     super(schema, root, options);
 
-    this.doValidation = false;
+    this.canValidate = false;
 
     const validationTimeOut = 10 * 1000;
 
     setInterval(() => {
-      this.doValidation = true;
+      this.canValidate = true;
     }, validationTimeOut, this);
   }
 
@@ -79,7 +79,7 @@ export class Validator extends BaseValidator {
    * the validator.
    */
   _runDocumentValidation(): void {
-    if(!(this.doValidation)) {
+    if(!(this.canValidate)) {
       return
     }
 
@@ -92,7 +92,7 @@ export class Validator extends BaseValidator {
       }
     }
 
-    this.doValidation = false;
+    this.canValidate = false;
   }
 
   /**
