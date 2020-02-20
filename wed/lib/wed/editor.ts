@@ -1722,10 +1722,7 @@ export class Editor implements EditorAPI {
       return this;
     }
 
-    // this.addValidators();
-    console.log(this.addValidators);
-
-    this.addChildrenChangedValidator();
+    this.addValidators();
 
     this.modeTree.addDecoratorHandlers();
 
