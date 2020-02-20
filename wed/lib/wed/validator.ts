@@ -29,6 +29,9 @@ export interface ModeValidator {
  * A document validator.
  */
 export class Validator extends BaseValidator {
+
+  private doValidation: boolean;
+
   /**
    * @param schema A path to the schema to pass to salve for validation. This is
    * a path that will be interpreted by RequireJS. The schema must have already
@@ -47,6 +50,14 @@ export class Validator extends BaseValidator {
               private readonly modeValidators: ModeValidator[],
               options: Options) {
     super(schema, root, options);
+
+    this.doValidation = false;
+
+    const validationTimeOut = 10 * 1000;
+
+    setInterval(() => {
+      this.doValidation = true;
+    }, validationTimeOut, this);
   }
 
   public static constructDefault(schema: Grammar,
@@ -68,12 +79,20 @@ export class Validator extends BaseValidator {
    * the validator.
    */
   _runDocumentValidation(): void {
+    if(!(this.doValidation)) {
+      return
+    }
+
+    console.log("Running Validation");
+
     for (const validator of this.modeValidators) {
       const errors = validator.validateDocument();
       for (const error of errors) {
         this._processError(error);
       }
     }
+
+    this.doValidation = false;
   }
 
   /**
