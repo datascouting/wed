@@ -44,7 +44,6 @@ define(function f(require) {
 
     function getOptions() {
         return {
-            "schema": "../schemas/tei-all-rng.js",
             "ajaxlog": {
                 "url": "/storage/log.txt"
             },
