@@ -765,14 +765,14 @@ export class Editor implements EditorAPI {
 
     return Promise.resolve()
       .then(() => {
-        let working = this.validator.getWorkingState().state === WorkingState.WORKING;
-        let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
+        // let working = this.validator.getWorkingState().state === WorkingState.WORKING;
+        // let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
 
-        while (working || incomplete) {
+        // while (working || incomplete) {
           // WAIT
-        }
+        // }
 
-        return;
+        // return;
       });
   }
 
