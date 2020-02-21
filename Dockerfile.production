@@ -12,17 +12,8 @@ RUN chmod +x /home/node/wed/bin/wed-metadata
 # Open project path
 WORKDIR /home/node/wed
 
-# Remove previous build and node_modules
-RUN rm -fr ./build
-
-# Install node mudules
-RUN npm install --verbose --prefer-offline --no-audit
-
-# Build with gulp
-RUN ./node_modules/gulp/bin/gulp.js
-
 # Deploy Wed
-RUN deployWed
+RUN buildAndDeployWed
 
 FROM nginx:stable as release
 

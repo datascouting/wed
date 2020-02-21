@@ -10,7 +10,7 @@ cd /home/node/wed
 rm -fr ./build
 
 # Install node mudules
-npm install --verbose --prefer-offline --no-audit
+yarn install
 
 # Build with gulp
 ./node_modules/gulp/bin/gulp.js
