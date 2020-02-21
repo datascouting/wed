@@ -1,44 +1,36 @@
-FROM debian:buster
+FROM node:10-buster
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
-ARG NODE_VERSION=10.x
 ARG SAXON9HE_SRC_PATH=./saxon/saxon9he.jar
 ARG SAXON_SRC_PATH=./saxon/saxon.sh
-ARG ROMA_5_SRC_PATH=./roma/roma-5.0.0.zip
-ARG ROME_5_TARGET_PATH=./Roma-5.0.0
-ARG TEI_XSL_7_SRC_PATH=./tei/tei-xsl-7.48.0.zip
+ARG ROMA_5_SRC_PATH=./roma/roma-5.0.1.zip
+ARG ROMA_5_TARGET_PATH=./Roma-5.0.1
+ARG TEI_XSL_7_SRC_PATH=./tei/tei-xsl-7.49.0.zip
 
 # Update package catalogue and install packages
 RUN DEBIAN_FRONTEND=noninteractive apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y apt-utils \
  && DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates \
                                                       curl \
-                                                      git \
-                                                      wget \
                                                       zip unzip \
                                                       libxml2-utils \
-                                                      trang \
-                                                      dos2unix \
- && curl -sL https://deb.nodesource.com/setup_${NODE_VERSION} | bash - \
- && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs
+                                                      trang
 
 # Install Saxonica's Saxon HE
 WORKDIR /tmp
 COPY /saxon /tmp/saxon
 RUN cp ${SAXON9HE_SRC_PATH} /usr/bin/saxon9he.jar \
  && cp ${SAXON_SRC_PATH} /usr/bin/saxon \
- && chmod +x /usr/bin/saxon \
- && dos2unix /usr/bin/saxon
+ && chmod +x /usr/bin/saxon
 
 # Install TEI Roma2
 WORKDIR /tmp
 COPY ${ROMA_5_SRC_PATH} /tmp/roma.zip
 RUN unzip roma.zip \
- && cp ${ROME_5_TARGET_PATH}/roma2.sh /usr/bin/roma2 \
+ && cp ${ROMA_5_TARGET_PATH}/roma2.sh /usr/bin/roma2 \
  && chmod +x /usr/bin/roma2 \
- && dos2unix /usr/bin/roma2 \
  && rm /tmp/roma.zip \
- && rm -fr ${ROME_5_TARGET_PATH}
+ && rm -fr ${ROMA_5_TARGET_PATH}
 
 # Install TEI Stylesheets
 WORKDIR /tmp

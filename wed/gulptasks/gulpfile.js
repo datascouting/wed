@@ -19,11 +19,8 @@ const {compile: compileToTS} = require("json-schema-to-typescript");
 
 const config = require("./config");
 const {
-  del, newer, exec, execFile, execFileAndReport, checkOutputFile, cprp,
-  cprpdir, defineTask, spawn, mkdirp, fs, stampPath,
+  del, newer, exec, execFileAndReport, mkdirp, fs, stampPath,
 } = require("./util");
-
-// const { test, seleniumTest } = require("./tests");
 
 const {ArgumentParser} = argparse;
 
@@ -242,24 +239,24 @@ gulp.task("copy-bin", () => gulp.src("bin/**/*")
   .pipe(replace("../build/", "../"))
   .pipe(gulp.dest("build/bin")));
 
-gulp.task("npm", ["stamp-dir"], Promise.coroutine(function* task() {
-  const stamp = stampPath("npm");
+gulp.task("yarn", ["stamp-dir"], Promise.coroutine(function* task() {
+  const stamp = stampPath("yarn");
 
-  const isNewer = yield newer(["package.json", "npm-shrinkwrap.json"], stamp);
+  const isNewer = yield newer(["package.json", "yarn.lock"], stamp);
 
   if (!isNewer) {
-    log("Skipping npm.");
+    log("Skipping yarn.");
     return;
   }
 
   yield mkdirp("node_modules");
-  yield exec("npm install");
+  yield exec("yarn install");
   yield touch(stamp);
 }));
 
 const copyTasks = [];
 
-function npmCopyTask(...args) {
+function yarnCopyTask(...args) {
   // Package is reserved. So `pack`.
   let name;
   let src;
@@ -335,7 +332,7 @@ function npmCopyTask(...args) {
 
   const fullName = `copy-${name}`;
   const stamp = stampPath(fullName);
-  gulp.task(fullName, ["stamp-dir", "npm"], (callback) => {
+  gulp.task(fullName, ["stamp-dir", "yarn"], (callback) => {
     let stream = gulp.src([pack].concat(completeSrc), {
       allowEmpty: false,
     });
@@ -367,24 +364,24 @@ function npmCopyTask(...args) {
   copyTasks.push(fullName);
 }
 
-npmCopyTask("jquery/dist/jquery.js");
+yarnCopyTask("jquery/dist/jquery.js");
 
-npmCopyTask("bootstrap/dist/**/*", "external/bootstrap");
+yarnCopyTask("bootstrap/dist/**/*", "external/bootstrap");
 
-npmCopyTask("font-awesome/{css,fonts}/**/*", "external/font-awesome");
+yarnCopyTask("font-awesome/{css,fonts}/**/*", "external/font-awesome");
 
-npmCopyTask("text-plugin", "requirejs-text/text.js", "requirejs");
+yarnCopyTask("text-plugin", "requirejs-text/text.js", "requirejs");
 
-npmCopyTask("requirejs/require.js", "requirejs");
+yarnCopyTask("requirejs/require.js", "requirejs");
 
-npmCopyTask("corejs-typeahead",
+yarnCopyTask("corejs-typeahead",
   "corejs-typeahead/dist/{bloodhound,typeahead.jquery}.min.js");
 
-npmCopyTask("localforage/dist/localforage.js");
+yarnCopyTask("localforage/dist/localforage.js");
 
-npmCopyTask("bootbox/dist/bootbox*.js");
+yarnCopyTask("bootbox/dist/bootbox*.js");
 
-npmCopyTask("urijs/src/**", "external/urijs",
+yarnCopyTask("urijs/src/**", "external/urijs",
   {
     through: (file, enc, callback) => {
       // Sigh... the punycode version included with the latest urijs
@@ -399,50 +396,50 @@ npmCopyTask("urijs/src/**", "external/urijs",
     },
   });
 
-npmCopyTask("lodash", "lodash-amd/{modern/**,main.js,package.json}",
+yarnCopyTask("lodash", "lodash-amd/{modern/**,main.js,package.json}",
   "external/lodash");
 
-npmCopyTask("classlist", "classlist-polyfill/src/index.js",
+yarnCopyTask("classlist", "classlist-polyfill/src/index.js",
   {rename: "classList.js"});
 
-npmCopyTask("salve/salve*");
+yarnCopyTask("salve/salve*");
 
-npmCopyTask("salve-dom/salve-dom*");
+yarnCopyTask("salve-dom/salve-dom*");
 
 
-npmCopyTask("merge-options", "merge-options/index.js",
+yarnCopyTask("merge-options", "merge-options/index.js",
   {rename: "merge-options.js", wrapAmd: true});
 
-npmCopyTask("is-plain-obj", "is-plain-obj/index.js",
+yarnCopyTask("is-plain-obj", "is-plain-obj/index.js",
   {rename: "is-plain-obj.js", wrapAmd: true});
 
-npmCopyTask("bluebird/js/browser/bluebird.js");
+yarnCopyTask("bluebird/js/browser/bluebird.js");
 
-npmCopyTask("last-resort/last-resort.js");
+yarnCopyTask("last-resort/last-resort.js");
 
-npmCopyTask("rangy/lib/**", "external/rangy");
+yarnCopyTask("rangy/lib/**", "external/rangy");
 
-npmCopyTask("bootstrap-notify/bootstrap-notify*.js");
+yarnCopyTask("bootstrap-notify/bootstrap-notify*.js");
 
-npmCopyTask("typeahead.js-bootstrap-css/typeaheadjs.css");
+yarnCopyTask("typeahead.js-bootstrap-css/typeaheadjs.css");
 
-npmCopyTask("dexie/dist/dexie{,.min}.js{.map,}");
+yarnCopyTask("dexie/dist/dexie{,.min}.js{.map,}");
 
-npmCopyTask("core-js/client/shim.min.js", {rename: "core-js.min.js"});
+yarnCopyTask("core-js/client/shim.min.js", {rename: "core-js.min.js"});
 
-npmCopyTask("zone.js/dist/zone.js");
+yarnCopyTask("zone.js/dist/zone.js");
 
-npmCopyTask("bluejax/index.js", {rename: "bluejax.js"});
+yarnCopyTask("bluejax/index.js", {rename: "bluejax.js"});
 
-npmCopyTask("bluejax.try/index.js", {rename: "bluejax.try.js"});
+yarnCopyTask("bluejax.try/index.js", {rename: "bluejax.try.js"});
 
-npmCopyTask("slug/slug-browser.js", {rename: "slug.js"});
+yarnCopyTask("slug/slug-browser.js", {rename: "slug.js"});
 
-npmCopyTask("rxjs/**", "external/rxjs", {wrapAmd: true});
+yarnCopyTask("rxjs/**", "external/rxjs", {wrapAmd: true});
 
-npmCopyTask("ajv/dist/ajv.min.js");
+yarnCopyTask("ajv/dist/ajv.min.js");
 
-npmCopyTask("diff/diff.js");
+yarnCopyTask("diff/diff.js");
 
 gulp.task("build-info", Promise.coroutine(function* task() {
   const dest = "build/standalone/lib/wed/build-info.js";
@@ -521,110 +518,7 @@ gulp.task("webpack", ["build-standalone"], () =>
   execFileAndReport("./node_modules/.bin/webpack", ["--color"],
     {maxBuffer: 300 * 1024}));
 
-gulp.task("rst-doc", () =>
-  gulp.src("*.rst", {read: false})
-    // eslint-disable-next-line array-callback-return
-    .pipe(through2.obj((file, enc, callback) => {
-      const dest = `${file.path.substr(
-        0, file.path.length - path.extname(file.path).length)}.html`;
-      exec(`${options.rst2html} ${file.path}` +
-        ` ${dest}`).asCallback(callback);
-    })));
-
 gulp.task("default", ["build"]);
-
-gulp.task("doc", ["rst-doc", "typedoc"]);
-
-// We make this a different task so that the check can be performed as
-// early as possible.
-gulp.task("gh-pages-check", Promise.coroutine(function* task() {
-  let [out] = yield checkOutputFile("git",
-    ["rev-parse", "--abbrev-ref", "HEAD"]);
-  out = out.trim();
-  if (out !== "master" && !options.force_gh_pages_build) {
-    throw new Error(`***
-Not on master branch. Don't build gh-pages-build on
-a branch other than master.
-***`);
-  }
-
-  if (!options.unsafe_deployment) {
-    // We use this only for the side effect it has:
-    // it fails of the current working directory is
-    // unclean.
-    yield exec("node ./misc/generate_build_info.js > /dev/null");
-  }
-}));
-
-function* ghPages() {
-  const dest = "gh-pages";
-  const merged = "build/merged-gh-pages";
-  yield fs.emptyDir(dest);
-  yield del(merged);
-  yield cprp("doc", merged);
-
-  // Yep we invoke make on the documentation.
-  yield exec(`make -C ${merged} html`);
-
-  yield exec(`cp -rp ${merged}/_build/html/* build/api ${dest}`);
-
-  const tutorialData = `${dest}/tutorial_data`;
-  yield cprpdir("build/standalone/lib/tests/wed_test_data/unit_selection.xml",
-    tutorialData);
-}
-
-gulp.task("gh-pages", ["gh-pages-check", "default", "doc"],
-  Promise.coroutine(ghPages));
-
-const LATEST_DIST = "build/LATEST-DIST.tgz";
-const packNoTest = {
-  name: "pack-notest",
-  deps: ["build-standalone", "webpack"],
-  * func() {
-    yield del("build/wed-*.tgz");
-    const dist = "build/dist";
-    yield fs.emptyDir(dist);
-    yield cprpdir(["build/standalone", "build/packed", "build/bin",
-        "package.json", "npm-shrinkwrap.json"],
-      dist);
-    yield fs.writeFile(path.join(dist, ".npmignore"), `\
-*
-!standalone/**
-!bin/**
-!packed/**
-standalone/lib/tests/**
-`);
-    yield cprp("NPM_README.md", `${dist}/README.md`);
-    const {stdout} = yield execFile("npm", ["pack"],
-      {cwd: dist, maxBuffer: 500 * 1024});
-    const packname = stdout.trim();
-    const buildPack = `build/${packname}`;
-    yield fs.rename(`${dist}/${packname}`, buildPack);
-    yield del(LATEST_DIST);
-    // We want packname without the `build/` path.
-    yield fs.symlink(packname, LATEST_DIST);
-    const tempPath = "build/t";
-    yield del(tempPath);
-    yield mkdirp(`${tempPath}/node_modules`);
-    yield spawn("npm", ["install", `../${packname}`], {cwd: tempPath});
-    yield del(tempPath);
-  },
-};
-defineTask(packNoTest);
-
-// sequence("pack", test, seleniumTest, packNoTest);
-
-function publish() {
-  // We have to execute this in the directory where the pack is located.
-  return spawn("npm", ["publish", "LATEST_DIST.tgz"], {
-    stdio: "inherit",
-    cwd: "./build",
-  });
-}
-
-gulp.task("publish", ["pack"], publish);
-
-gulp.task("publish-notest", ["pack-notest"], publish);
 
 gulp.task("clean", () => del(["build", "gh-pages", "*.html"]));
 

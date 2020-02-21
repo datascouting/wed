@@ -1,7 +1,7 @@
 version: '3'
 
 services:
-  development-server:
+  production-server:
     container_name: "wed-production-server"
     image: wed-ds:latest
     restart: on-failure

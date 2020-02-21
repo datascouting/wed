@@ -3,7 +3,7 @@ const {wgetIfMissing} = require("./wget");
 
 // We need this to download the version of sinon which is built for
 // browsers.
-gulp.task("download-sinon", ["npm"], () => {
+gulp.task("download-sinon", ["yarn"], () => {
   // eslint-disable-next-line global-require
   const {version} = require("../node_modules/sinon/package.json");
 

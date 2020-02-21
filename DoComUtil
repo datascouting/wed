@@ -35,9 +35,9 @@ case "${ACTION}" in
 "access")
   if [ "${DOCKER_FILE}" == "docker-compose-production.yml"  ];
   then
-      docker exec -it --user user wed-production-server /bin/bash
+      docker exec -it wed-production-server /bin/bash
   else
-      docker exec -it --user user wed-development-server /bin/bash
+      docker exec -it --user node wed-development-server /bin/bash
   fi
   ;;
 "deploy")
