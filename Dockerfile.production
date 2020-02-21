@@ -2,15 +2,15 @@ FROM wed-ds-common:latest as builder
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 # Copy wed project and www
-COPY ./wed /home/user/wed
-COPY ./www /home/user/vhosts/public
+COPY ./wed /home/node/wed
+COPY ./www /home/node/vhosts/public
 
 # Build Wed
 # Fix wed-metadata file
-RUN chmod +x /home/user/wed/bin/wed-metadata
+RUN chmod +x /home/node/wed/bin/wed-metadata
 
 # Open project path
-WORKDIR /home/user/wed
+WORKDIR /home/node/wed
 
 # Remove previous build and node_modules
 RUN rm -fr ./build
@@ -26,7 +26,7 @@ RUN deployWed
 
 FROM nginx:stable as release
 
-COPY --from=builder /home/user/vhosts/public/ /usr/share/nginx/html/
+COPY --from=builder /home/node/vhosts/public/ /usr/share/nginx/html/
 
 RUN rm /usr/share/nginx/html/.htaccess \
  && rm /etc/nginx/conf.d/default.conf

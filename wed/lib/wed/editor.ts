@@ -765,14 +765,15 @@ export class Editor implements EditorAPI {
 
     return Promise.resolve()
       .then(() => {
-        // let working = this.validator.getWorkingState().state === WorkingState.WORKING;
-        // let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
+        let working = this.validator.getWorkingState().state === WorkingState.WORKING;
+        let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
 
-        // while (working || incomplete) {
-          // WAIT
-        // }
+        while (working || incomplete) {
+          // JUST WAIT
 
-        // return;
+          working = this.validator.getWorkingState().state === WorkingState.WORKING;
+          incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
+        }
       });
   }
 
@@ -2038,6 +2039,7 @@ wed's generic help. The link by default will open in a new tab.</p>`);
 
     await savePromise;
     this.initializedResolve(this);
+
     return this;
   }
 

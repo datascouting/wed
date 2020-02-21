@@ -2,8 +2,8 @@
 
 cleanWed
 
-cp -r /home/user/wed/build/packed/* /home/user/vhosts/public/
-cp -r /home/user/wed/build/schemas /home/user/vhosts/public/
+cp -r /home/node/wed/build/packed/* /home/node/vhosts/public/
+cp -r /home/node/wed/build/schemas /home/node/vhosts/public/
 
-rm /home/user/vhosts/public/kitchen-sink.html
-rm /home/user/vhosts/public/lib/kitchen-sink.js
+rm /home/node/vhosts/public/kitchen-sink.html
+rm /home/node/vhosts/public/lib/kitchen-sink.js

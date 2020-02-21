@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Fix wed-metadata file
-chmod +x /home/user/wed/bin/wed-metadata
+chmod +x /home/node/wed/bin/wed-metadata
 
 # Open project path
-cd /home/user/wed
+cd /home/node/wed
 
 # Remove previous build and node_modules
 rm -fr ./build

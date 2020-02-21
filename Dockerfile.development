@@ -6,19 +6,9 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y supervisor \
                                                       apache2 \
  && a2enmod rewrite headers
 
-# Get arguments for user creation and password changes
-ARG SERVER_USER_UID=1000
-ARG SERVER_USER_GID=1000
-ARG SERVER_USER_PASSWORD=secret
-
-# Add user and set password
-RUN groupadd -r user -g "${SERVER_USER_GID}" \
- && useradd -ms /bin/bash user -u "${SERVER_USER_UID}" -g "${SERVER_USER_GID}" \
- && echo user:${SERVER_USER_PASSWORD} | chpasswd
-
 ## Change Apache2 user
-RUN sed -i -e"s/^export\s*APACHE_RUN_USER=www-data/export APACHE_RUN_USER=user/" /etc/apache2/envvars \
- && sed -i -e"s/^export\s*APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=user/" /etc/apache2/envvars
+RUN sed -i -e"s/^export\s*APACHE_RUN_USER=www-data/export APACHE_RUN_USER=node/" /etc/apache2/envvars \
+ && sed -i -e"s/^export\s*APACHE_RUN_GROUP=www-data/export APACHE_RUN_GROUP=node/" /etc/apache2/envvars
 
 RUN echo 'ServerName localhost' >> /etc/apache2/apache2.conf
 
@@ -32,7 +22,7 @@ RUN cd /etc/apache2/sites-available \
 COPY ./config/supervisor /etc/supervisor/conf.d
 RUN chown root:root /etc/supervisor/conf.d/* && chmod 644 /etc/supervisor/conf.d/*
 
-WORKDIR /home/user
+WORKDIR /home/node
 
 EXPOSE 80
 
