@@ -19,11 +19,8 @@ const {compile: compileToTS} = require("json-schema-to-typescript");
 
 const config = require("./config");
 const {
-  del, newer, exec, execFile, execFileAndReport, checkOutputFile, cprp,
-  cprpdir, defineTask, spawn, mkdirp, fs, stampPath,
+  del, newer, exec, execFileAndReport, mkdirp, fs, stampPath,
 } = require("./util");
-
-// const { test, seleniumTest } = require("./tests");
 
 const {ArgumentParser} = argparse;
 
@@ -521,74 +518,7 @@ gulp.task("webpack", ["build-standalone"], () =>
   execFileAndReport("./node_modules/.bin/webpack", ["--color"],
     {maxBuffer: 300 * 1024}));
 
-gulp.task("rst-doc", () =>
-  gulp.src("*.rst", {read: false})
-    // eslint-disable-next-line array-callback-return
-    .pipe(through2.obj((file, enc, callback) => {
-      const dest = `${file.path.substr(
-        0, file.path.length - path.extname(file.path).length)}.html`;
-      exec(`${options.rst2html} ${file.path}` +
-        ` ${dest}`).asCallback(callback);
-    })));
-
 gulp.task("default", ["build"]);
-
-gulp.task("doc", ["rst-doc", "typedoc"]);
-
-// We make this a different task so that the check can be performed as
-// early as possible.
-gulp.task("gh-pages-check", Promise.coroutine(function* task() {
-  let [out] = yield checkOutputFile("git",
-    ["rev-parse", "--abbrev-ref", "HEAD"]);
-  out = out.trim();
-  if (out !== "master" && !options.force_gh_pages_build) {
-    throw new Error(`***
-Not on master branch. Don't build gh-pages-build on
-a branch other than master.
-***`);
-  }
-
-  if (!options.unsafe_deployment) {
-    // We use this only for the side effect it has:
-    // it fails of the current working directory is
-    // unclean.
-    yield exec("node ./misc/generate_build_info.js > /dev/null");
-  }
-}));
-
-function* ghPages() {
-  const dest = "gh-pages";
-  const merged = "build/merged-gh-pages";
-  yield fs.emptyDir(dest);
-  yield del(merged);
-  yield cprp("doc", merged);
-
-  // Yep we invoke make on the documentation.
-  yield exec(`make -C ${merged} html`);
-
-  yield exec(`cp -rp ${merged}/_build/html/* build/api ${dest}`);
-
-  const tutorialData = `${dest}/tutorial_data`;
-  yield cprpdir("build/standalone/lib/tests/wed_test_data/unit_selection.xml",
-    tutorialData);
-}
-
-gulp.task("gh-pages", ["gh-pages-check", "default", "doc"],
-  Promise.coroutine(ghPages));
-
-// sequence("pack", test, seleniumTest, packNoTest);
-
-function publish() {
-  // We have to execute this in the directory where the pack is located.
-  return spawn("yarn", ["publish", "LATEST_DIST.tgz"], {
-    stdio: "inherit",
-    cwd: "./build",
-  });
-}
-
-gulp.task("publish", ["pack"], publish);
-
-gulp.task("publish-notest", ["pack-notest"], publish);
 
 gulp.task("clean", () => del(["build", "gh-pages", "*.html"]));
 
