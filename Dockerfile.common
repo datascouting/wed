@@ -1,4 +1,4 @@
-FROM node:10-buster
+FROM node:lts
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 ARG SAXON9HE_SRC_PATH=./saxon/saxon9he.jar
