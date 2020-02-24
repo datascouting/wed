@@ -9,7 +9,7 @@ COPY ./www /home/node/vhosts/public
 WORKDIR /home/node/wed
 
 # Deploy Wed
-RUN build && deploy
+RUN buildAndDeployWed
 
 FROM nginx:stable as release
 
