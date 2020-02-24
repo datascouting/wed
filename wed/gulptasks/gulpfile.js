@@ -425,7 +425,7 @@ yarnCopyTask("typeahead.js-bootstrap-css/typeaheadjs.css");
 
 yarnCopyTask("dexie/dist/dexie{,.min}.js{.map,}");
 
-yarnCopyTask("core-js/client/shim.min.js", {rename: "core-js.min.js"});
+yarnCopyTask("core-js-bundle/minified.js", {rename: "core-js.min.js"});
 
 yarnCopyTask("zone.js/dist/zone.js");
 
