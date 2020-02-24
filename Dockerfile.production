@@ -1,26 +1,22 @@
 FROM wed-ds-common:latest as builder
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
-# Copy wed project and www
+# Copy Wed project and www
 COPY ./wed /home/node/wed
 COPY ./www /home/node/vhosts/public
 
-# Build Wed
-# Fix wed-metadata file
-RUN chmod +x /home/node/wed/bin/wed-metadata
-
-# Open project path
+# Open Wed path
 WORKDIR /home/node/wed
 
 # Deploy Wed
-RUN buildAndDeployWed
+RUN build && deploy
 
 FROM nginx:stable as release
 
 COPY --from=builder /home/node/vhosts/public/ /usr/share/nginx/html/
+COPY ./config/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 RUN rm /usr/share/nginx/html/.htaccess \
  && rm /etc/nginx/conf.d/default.conf
-COPY ./config/nginx/default.conf /etc/nginx/conf.d/default.conf
 
 WORKDIR /usr/share/nginx/html/
