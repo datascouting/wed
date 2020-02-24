@@ -1,9 +1,10 @@
 #!/bin/bash
 
-DEPLOY_PATH_LIB=/home/node/vhosts/public/lib
-DEPLOY_PATH_SCHEMA=/home/node/vhosts/public/schemas
-DEPLOY_REQUIREJS_CONFIG=/home/node/vhosts/public/requirejs-config.js
+PUBLIC_PATH="/home/node/vhosts/public"
 
-rm -fr ${DEPLOY_PATH_LIB} || echo "Can't remove"
-rm -fr ${DEPLOY_PATH_SCHEMA} || echo "Can't remove"
-rm -f ${DEPLOY_REQUIREJS_CONFIG} || echo "Can't remove"
+PUBLIC_LIBRARY_PATH=${PUBLIC_PATH}/lib \
+&& PUBLIC_SCHEMAS_PATH=${PUBLIC_PATH}/schemas \
+&& PUBLIC_REQUIREJS_CONFIG_FILE=${PUBLIC_PATH}/requirejs-config.js \
+&& rm -fr ${PUBLIC_LIBRARY_PATH} || echo "Can't remove public library path" \
+&& rm -fr ${PUBLIC_SCHEMAS_PATH} || echo "Can't remove public schemas path" \
+&& rm -f ${PUBLIC_REQUIREJS_CONFIG_FILE} || echo "Can't remove public requrejs config file"

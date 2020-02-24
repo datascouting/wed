@@ -1,4 +1,3 @@
 #!/bin/bash
 
-buildWed
-deployWed
+buildWed && deployWed

@@ -1,9 +1,10 @@
 #!/bin/bash
 
-cleanWed
+BUILD_PATH=/home/node/wed/build
+PUBLIC_PATH="/home/node/vhosts/public"
 
-cp -r /home/node/wed/build/packed/* /home/node/vhosts/public/
-cp -r /home/node/wed/build/schemas /home/node/vhosts/public/
-
-rm /home/node/vhosts/public/kitchen-sink.html
-rm /home/node/vhosts/public/lib/kitchen-sink.js
+cleanWed \
+&& cp -r ${BUILD_PATH}/packed/* ${PUBLIC_PATH} \
+&& cp -r ${BUILD_PATH}/schemas ${PUBLIC_PATH} \
+&& rm ${PUBLIC_PATH}/kitchen-sink.html \
+&& rm ${PUBLIC_PATH}/lib/kitchen-sink.js

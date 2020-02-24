@@ -425,7 +425,7 @@ yarnCopyTask("typeahead.js-bootstrap-css/typeaheadjs.css");
 
 yarnCopyTask("dexie/dist/dexie{,.min}.js{.map,}");
 
-yarnCopyTask("core-js/client/shim.min.js", {rename: "core-js.min.js"});
+yarnCopyTask("core-js-bundle/minified.js", {rename: "core-js.min.js"});
 
 yarnCopyTask("zone.js/dist/zone.js");
 
@@ -439,7 +439,7 @@ yarnCopyTask("rxjs/**", "external/rxjs", {wrapAmd: true});
 
 yarnCopyTask("ajv/dist/ajv.min.js");
 
-yarnCopyTask("diff/diff.js");
+yarnCopyTask("diff/dist/diff.js");
 
 gulp.task("build-info", Promise.coroutine(function* task() {
   const dest = "build/standalone/lib/wed/build-info.js";
