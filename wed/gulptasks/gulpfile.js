@@ -439,7 +439,7 @@ yarnCopyTask("rxjs/**", "external/rxjs", {wrapAmd: true});
 
 yarnCopyTask("ajv/dist/ajv.min.js");
 
-yarnCopyTask("diff/diff.js");
+yarnCopyTask("diff/dist/diff.js");
 
 gulp.task("build-info", Promise.coroutine(function* task() {
   const dest = "build/standalone/lib/wed/build-info.js";
