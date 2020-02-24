@@ -5866,9 +5866,9 @@ range-parser@^1.2.0, range-parser@~1.2.1:
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.1.tgz#3cf37023d199e1c24d1a55b84800c2f3e6468031"
   integrity sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==
 
-"rangy@git+https://github.com/lddubeau/rangy.git#feature/custom-is-collapsed-node":
+rangy@lddubeau/rangy#feature/custom-is-collapsed-node:
   version "1.3.1-dev"
-  resolved "git+https://github.com/lddubeau/rangy.git#80b51236eb83a50a17138decfcf7e424096fb406"
+  resolved "https://codeload.github.com/lddubeau/rangy/tar.gz/80b51236eb83a50a17138decfcf7e424096fb406"
 
 raw-body@2.4.0:
   version "2.4.0"

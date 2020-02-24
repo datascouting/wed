@@ -109,7 +109,7 @@
     "mocha": "^5.2.0",
     "morgan": "^1.9.1",
     "qs": "^6.9.0",
-    "rangy": "git+https://github.com/lddubeau/rangy.git#feature/custom-is-collapsed-node",
+    "rangy": "lddubeau/rangy#feature/custom-is-collapsed-node",
     "raw-loader": "^0.5.1",
     "require-dir": "^1.2.0",
     "requirejs": "^2.3.0",
