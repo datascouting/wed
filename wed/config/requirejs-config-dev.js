@@ -103,7 +103,7 @@ require.config({
       exports: "angular",
     },
   },
-  waitSeconds: 12,
+  waitSeconds: 60,
   enforceDefine: true,
 });
 
