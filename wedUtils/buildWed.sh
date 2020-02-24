@@ -1,6 +1,6 @@
 #!/bin/bash
 
-fixWedMetadata \
+chmod +x /home/node/wed/bin/wed-metadata \
 && cd /home/node/wed \
 && rm -fr /home/node/wed/build \
 && yarn install \

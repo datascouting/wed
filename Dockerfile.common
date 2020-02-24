@@ -1,4 +1,4 @@
-FROM node:10
+FROM node:10-buster
 LABEL maintainer="Iordanis Kostelidis <ikostelidis@datascouting.com>"
 
 ARG SAXON9HE_SRC_PATH=./saxon/saxon9he.jar
@@ -42,12 +42,12 @@ RUN unzip tei-xsl.zip -d /usr/share \
 # Install wed utils
 WORKDIR /tmp
 COPY ./wedUtils /tmp/wedUtils
-RUN mv ./wedUtils/fixWedMetadata.sh ./wedUtils/fixWedMetadata \
- && mv ./wedUtils/build.sh ./wedUtils/build \
- && mv ./wedUtils/undeploy.sh ./wedUtils/undeploy \
- && mv ./wedUtils/deploy.sh ./wedUtils/deploy \
+RUN mv ./wedUtils/buildWed.sh ./wedUtils/buildWed \
+ && mv ./wedUtils/cleanWed.sh ./wedUtils/cleanWed \
+ && mv ./wedUtils/deployWed.sh ./wedUtils/deployWed \
+ && mv ./wedUtils/buildAndDeployWed.sh ./wedUtils/buildAndDeployWed \
  && cp -r ./wedUtils/* /usr/bin/ \
- && chmod +x /usr/bin/fixWedMetadata \
- && chmod +x /usr/bin/build \
- && chmod +x /usr/bin/undeploy \
- && chmod +x /usr/bin/deploy
+ && chmod +x /usr/bin/buildWed \
+ && chmod +x /usr/bin/cleanWed \
+ && chmod +x /usr/bin/deployWed \
+ && chmod +x /usr/bin/buildAndDeployWed
