@@ -11,27 +11,44 @@ getDocHtmlUrlPattern = () => {
     return "http://localhost:8088/schemas/tei-doc/ref-${name:s(\":\",\"_\")}.html";
 };
 
-const defaultTEI = "<TEI version=\"3.3.0\" xmlns=\"http://www.tei-c.org/ns/1.0\">\n" +
-    " <teiHeader>\n" +
-    "  <fileDesc>\n" +
-    "   <titleStmt>\n" +
-    "    <title>The shortest TEI Document Imaginable</title>\n" +
-    "   </titleStmt>\n" +
-    "   <publicationStmt>\n" +
-    "    <p>First published as part of TEI P2, this is the P5\n" +
-    "         version using a name space.</p>\n" +
-    "   </publicationStmt>\n" +
-    "   <sourceDesc>\n" +
-    "    <p>No source: this is an original work.</p>\n" +
-    "   </sourceDesc>\n" +
-    "  </fileDesc>\n" +
-    " </teiHeader>\n" +
-    " <text>\n" +
-    "  <body>\n" +
-    "   <p>This is about the shortest TEI document imaginable.</p>\n" +
-    "  </body>\n" +
-    " </text>\n" +
-    "</TEI>";
+let makeRequest = function (url, method) {
+
+    // Create the XHR request
+    let request = new XMLHttpRequest();
+
+    // Return it as a Promise
+    return new Promise(function (resolve, reject) {
+
+        // Setup our listener to process compeleted requests
+        request.onreadystatechange = function () {
+
+            // Only run if the request is complete
+            if (request.readyState !== 4) return;
+
+            // Process the response
+            if (request.status >= 200 && request.status < 300) {
+                // If successful
+                resolve(request);
+            } else {
+                // If failed
+                reject({
+                    status: request.status,
+                    statusText: request.statusText
+                });
+            }
+
+        };
+
+        // Setup our HTTP request
+        request.open(method || 'GET', url, true);
+
+        // Send the request
+        request.send();
+
+    });
+};
+
+const defaultTeiFile = "http://localhost:8088/example.tei.xml";
 
 /* global Promise */
 define(function f(require) {
@@ -60,7 +77,10 @@ define(function f(require) {
         var widget = document.getElementById("widget");
         var finalOptions = mergeOptions({}, globalConfig.config, getOptions());
         window.wed_editor = wed.makeEditor(widget, finalOptions);
-        window.wed_editor.init(defaultTEI);
+
+        return makeRequest(defaultTeiFile)
+            .then(response => response.responseText)
+            .then(content => window.wed_editor.init(content));
     });
 });
 
