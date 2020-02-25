@@ -48,7 +48,7 @@ let makeRequest = function (url, method) {
     });
 };
 
-const defaultTeiFile = "http://localhost:8088/example.tei.xml";
+const defaultTeiFile = "/example.tei.xml";
 
 /* global Promise */
 define(function f(require) {
@@ -61,7 +61,7 @@ define(function f(require) {
 
     function getOptions() {
         return {
-            "schema": "../schemas/test.js",
+            "schema": "../schemas/ecarle6-rng.js",
             "ajaxlog": {
                 "url": "/storage/log.txt"
             },
