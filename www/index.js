@@ -61,6 +61,7 @@ define(function f(require) {
 
     function getOptions() {
         return {
+            "schema": "../schemas/test.js",
             "ajaxlog": {
                 "url": "/storage/log.txt"
             },
