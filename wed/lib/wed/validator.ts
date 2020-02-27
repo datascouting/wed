@@ -25,6 +25,22 @@ export interface ModeValidator {
   validateDocument(): ErrorData[];
 }
 
+function secondsToMilliseconds(seconds: number): number {
+  if(typeof seconds ==="undefined") {
+    return 0;
+  }
+
+  if(seconds === 0) {
+    return 0;
+  }
+
+  return seconds * 1000;
+}
+
+const salveTimeout = secondsToMilliseconds(2);
+const salveTimespan = secondsToMilliseconds(1);
+const salveThrottle = secondsToMilliseconds(60 * 10); // 10 Minutes
+
 /**
  * A document validator.
  */
@@ -52,12 +68,10 @@ export class Validator extends BaseValidator {
     super(schema, root, options);
 
     this.canValidate = false;
-
-    const validationTimeOut = 10 * 1000;
-
+    //
     setInterval(() => {
       this.canValidate = true;
-    }, validationTimeOut, this);
+    }, salveThrottle, this);
   }
 
   public static constructDefault(schema: Grammar,
@@ -68,10 +82,24 @@ export class Validator extends BaseValidator {
       root,
       modeValidators,
       {
-        timeout: 0,
-        maxTimespan: 100
+        timeout: salveTimeout,
+        maxTimespan: salveTimespan
       }
     );
+  }
+
+  customValidationHandler(typeOfValidation: String, functionOfValidation: Function): void {
+    console.log(typeOfValidation);
+
+    if (!(this.canValidate)) {
+      console.log("Throttling validation, please wait...");
+      return
+    }
+
+    console.log("Validating...");
+    functionOfValidation();
+
+    this.canValidate = false;
   }
 
   /**
@@ -79,20 +107,54 @@ export class Validator extends BaseValidator {
    * the validator.
    */
   _runDocumentValidation(): void {
-    if(!(this.canValidate)) {
-      return
-    }
-
-    console.log("Running Validation");
-
-    for (const validator of this.modeValidators) {
-      const errors = validator.validateDocument();
-      for (const error of errors) {
-        this._processError(error);
+    const typeOfValidation = "_runDocumentValidation";
+    const functionOfValidation = () => {
+      for (const validator of this.modeValidators) {
+        const errors = validator.validateDocument();
+        for (const error of errors) {
+          this._processError(error);
+        }
       }
-    }
+    };
 
-    this.canValidate = false;
+    this.customValidationHandler(typeOfValidation, functionOfValidation.bind(this))
+  }
+
+  /**
+   * Runs document-wide validation specific to the mode passed to
+   * the validator.
+   */
+  _runDocumentValidationImmediately(): void {
+    this.canValidate = true;
+    this._runDocumentValidation();
+  }
+
+  restartAt(node: Node): void {
+    const typeOfValidation = "restartAt";
+    const functionOfValidation = () => {
+      super.restartAt(node);
+    };
+
+    this.customValidationHandler(typeOfValidation, functionOfValidation.bind(this))
+  }
+
+  restartAtImmediately(node: Node): void {
+    this.canValidate = true;
+    this.restartAt(node);
+  }
+
+  resetTo(node: Node): void {
+    const typeOfValidation = "resetTo";
+    const functionOfValidation = () => {
+      super.resetTo(node);
+    };
+
+    this.customValidationHandler(typeOfValidation, functionOfValidation.bind(this))
+  }
+
+  resetToImmediately(node: Node): void {
+    this.canValidate = true;
+    this.resetTo(node);
   }
 
   /**

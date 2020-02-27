@@ -758,23 +758,26 @@ export class Editor implements EditorAPI {
     return this.saver.save();
   }
 
+  pendingValidation(): Boolean {
+    const workingState = this.validator.getWorkingState().state;
+
+    return (workingState === WorkingState.WORKING || workingState === WorkingState.INCOMPLETE);
+  }
+
   validate(): Promise<void> {
-    // TODO: Optimize
-    let document = $('.wed-document').children().get()[0];
-    this.validator.restartAt(document);
-
-    return Promise.resolve()
-      .then(() => {
-        let working = this.validator.getWorkingState().state === WorkingState.WORKING;
-        let incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
-
-        while (working || incomplete) {
-          // JUST WAIT
-
-          working = this.validator.getWorkingState().state === WorkingState.WORKING;
-          incomplete = this.validator.getWorkingState().state === WorkingState.INCOMPLETE;
-        }
-      });
+    return Promise.resolve(this.pendingValidation())
+      .then(pending => (pending)
+        ? Promise.resolve()
+        : Promise.resolve($('.wed-document'))
+          .then(wedDocumentParent => wedDocumentParent.children())
+          .then(wedDocumentChild => wedDocumentChild.get())
+          .then(documents => documents[0])
+          .then(document => this.validator.restartAtImmediately(document))
+          .then(() => {
+            while (this.pendingValidation()) {
+              console.count("Waiting for validation completion...");
+            }
+          }));
   }
 
   insertText(text: string): void {
@@ -927,6 +930,7 @@ export class Editor implements EditorAPI {
 
   async init(xmlData?: string): Promise<Editor> {
     const parser = new this.window.DOMParser();
+
     if (xmlData !== undefined && xmlData !== "") {
       this.dataRoot = parser.parseFromString(xmlData, "text/xml");
       this._dataChild = this.dataRoot.firstChild as Element;
@@ -934,6 +938,7 @@ export class Editor implements EditorAPI {
       this.dataRoot = parser.parseFromString("<div></div>", "text/xml");
       this._dataChild = undefined;
     }
+
     this.dataRoot.removeChild(this.dataRoot.firstChild!);
 
     // $dataRoot is the document we are editing, $guiRoot will become decorated

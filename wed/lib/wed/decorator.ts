@@ -231,8 +231,9 @@ ${domutil.textToHTML(attributes[name])}</span>"</span>`;
     const prePh = doc.createElement("span");
     prePh.className = "_phantom";
     // tslint:disable-next-line:no-inner-html
-    prePh.innerHTML = `&nbsp;<span class='_phantom _element_name'>${origName}\
-</span>${attributesHTML}<span class='_phantom _greater_than'> >&nbsp;</span>`;
+    prePh.innerHTML = `<span class='_phantom _less_than'>&lt;</span>\
+    <span class='_phantom _element_name'>${origName}\
+    </span>${attributesHTML}<span class='_phantom _greater_than'>&gt;</span>`;
     pre.appendChild(prePh);
     this.guiUpdater.insertNodeAt(el, 0, pre);
 
@@ -241,8 +242,8 @@ ${domutil.textToHTML(attributes[name])}</span>"</span>`;
     const postPh = doc.createElement("span");
     postPh.className = "_phantom";
     // tslint:disable-next-line:no-inner-html
-    postPh.innerHTML = `<span class='_phantom _less_than'>&nbsp;&lt; </span>\
-<span class='_phantom _element_name'>${origName}</span>&nbsp;`;
+    postPh.innerHTML = `<span class='_phantom _less_than'>&lt;/</span>\
+    <span class='_phantom _element_name'>${origName}</span>&gt;`;
     post.appendChild(postPh);
     this.guiUpdater.insertBefore(el, post, null);
 

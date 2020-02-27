@@ -20,11 +20,13 @@ export function makeAction(desc: string,
                            icon: string,
                            needsInput: boolean,
                            fn: Handler): ActionCtor;
+
 export function makeAction(desc: string,
                            icon: string,
                            abbreviatedDesc: string,
                            needsInput: boolean,
                            fn: Handler): ActionCtor;
+
 export function makeAction(desc: string,
                            abbreviatedDesc: string | undefined,
                            icon: string | boolean,
